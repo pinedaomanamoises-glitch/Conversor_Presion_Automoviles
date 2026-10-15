@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertidor de Presión de Llantas Pro</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 24px; }
+        header { text-align: center; background-color: #1e293b; border: 2px solid #334155; border-radius: 24px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        header h1 { font-size: 2.5rem; color: #22d3ee; margin-bottom: 8px; font-weight: 800; }
+        header p { font-size: 1.25rem; color: #cbd5e1; }
+        .card { background-color: #1e293b; border: 2px solid #334155; border-radius: 24px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 16px; }
+        .card h2 { font-size: 1.75rem; font-weight: bold; text-align: center; }
+        .card p { font-size: 1.1rem; color: #cbd5e1; text-align: center; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .input-group { background-color: #0f172a; padding: 16px; border-radius: 16px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; }
+        .input-group label { font-size: 1.1rem; font-weight: bold; color: #67e8f9; }
+        .input-group input { width: 100%; background-color: #1e293b; color: #ffffff; font-size: 1.8rem; font-weight: bold; padding: 12px; border-radius: 12px; border: 2px solid #06b6d4; text-align: center; outline: none; }
+        .input-group input:focus { border-color: #22d3ee; box-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
+        .btn { cursor: pointer; font-weight: bold; font-size: 1.25rem; padding: 16px 24px; border-radius: 16px; border: none; transition: background 0.2s, transform 0.1s; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .btn:active { transform: scale(0.98); }
+        .btn-danger { background-color: #e11d48; color: white; }
+        .btn-danger:hover { background-color: #be123c; }
+        .btn-success { background-color: #16a34a; color: white; }
+        .btn-success:hover { background-color: #15803d; }
+        .btn-cyan { background-color: #0891b2; color: white; }
+        .btn-cyan:hover { background-color: #0e7490; }
+        .btn-emerald { background-color: #059669; color: white; }
+        .btn-emerald:hover { background-color: #047857; }
+        .search-box { display: flex; gap: 12px; flex-wrap: wrap; }
+        .search-box input { flex: 1; min-width: 250px; background-color: #0f172a; color: #ffffff; font-size: 1.5rem; padding: 16px; border-radius: 16px; border: 2px solid #22c55e; outline: none; }
+        .search-box input:focus { border-color: #4ade80; box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 12px; }
+        .car-card { background-color: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .car-brand { color: #22d3ee; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .car-model { font-size: 1.8rem; font-weight: 800; color: #ffffff; margin-top: 4px; }
+        .pressure-box { background-color: #1e293b; padding: 12px; border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; }
+        .pressure-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem; }
+        .pressure-row span { color: #cbd5e1; }
+        .pressure-row strong { color: #67e8f9; }
+        .car-buttons { display: flex; gap: 8px; }
+        .car-buttons button { flex: 1; padding: 12px; font-size: 1.1rem; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: white; }
+        .notice-box { background-color: rgba(136, 19, 55, 0.4); border: 2px solid #be123c; padding: 20px; border-radius: 16px; text-align: center; }
+        .notice-box h3 { font-size: 1.5rem; color: #fca5a5; margin-bottom: 8px; }
+        .notice-box p { font-size: 1.1rem; color: #e2e8f0; }
+        .suggestions-flex { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 12px; }
+        .suggestions-flex button { background-color: #1e293b; border: 1px solid #475569; color: #67e8f9; font-weight: bold; font-size: 1.1rem; padding: 12px 16px; border-radius: 12px; cursor: pointer; }
+        .suggestions-flex button:hover { background-color: #334155; }
+        @media(max-width: 640px) {
+            header h1 { font-size: 2rem; }
+            .search-box { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- TÍTULO PRINCIPAL -->
+        <header>
+            <h1>🚗 Presión de Llantas</h1>
+            <p>Conversor Universal y Base de Datos Oficial</p>
+        </header>
+
+        <!-- SECCIÓN 1: CONVERSOR UNIVERSAL -->
+        <section class="card">
+            <h2 style="color: #facc15;">🧮 Conversor Universal</h2>
+            <p>Escribe en <strong>cualquier casilla</strong> y se convertirá al instante en las demás:</p>
+            
+            <div class="grid-4">
+                <div class="input-group">
+                    <label>PSI (lb/in²)</label>
+                    <input type="number" step="any" id="input-psi" placeholder="Ej. 32" oninput="convertFrom('psi')">
+                </div>
+                <div class="input-group">
+                    <label>kPa</label>
+                    <input type="number" step="any" id="input-kpa" placeholder="Ej. 220" oninput="convertFrom('kpa')">
+                </div>
+                <div class="input-group">
+                    <label>bar</label>
+                    <input type="number" step="any" id="input-bar" placeholder="Ej. 2.2" oninput="convertFrom('bar')">
+                </div>
+                <div class="input-group">
+                    <label>kgf/cm²</label>
+                    <input type="number" step="any" id="input-kgf" placeholder="Ej. 2.25" oninput="convertFrom('kgf')">
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 8px;">
+                <button onclick="clearAll()" class="btn btn-danger">🗑️ Limpiar Valores</button>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: BUSCADOR DE AUTOS Y RECOMENDACIONES -->
+        <section class="card">
+            <h2 style="color: #4ade80;">🔍 Buscador de Autos y Presión Ideal</h2>
+            <p>Escribe la marca o modelo de tu auto y presiona <strong>"Buscar"</strong>:</p>
+            
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Ej. Nissan Versa, Jetta, Civic, Hilux..." onkeypress="handleKeyPress(event)">
+                <button onclick="searchCar()" class="btn btn-success" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    🔍 Buscar
+                </button>
+            </div>
+
+            <!-- RESULTADOS Y SUGERENCIAS -->
+            <div id="search-results" style="margin-top: 8px;">
+                <div style="text-align: center; color: #94a3b8; font-size: 1.2rem; padding: 24px; background-color: #0f172a; border-radius: 16px; border: 1px solid #334155;">
+                    Escribe un modelo arriba para consultar su presión recomendada.
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // BASE DE DATOS COMPLETA DE AUTOS Y PRESIONES (PSI Estándar Delanteras / Traseras)
+        const carDatabase = [
+            {brand: "Nissan", model: "Versa", front: 33, rear: 30},
+            {brand: "Nissan", model: "Sentra", front: 33, rear: 30},
+            {brand: "Nissan", model: "March", front: 32, rear: 30},
+            {brand: "Nissan", model: "Kicks", front: 33, rear: 30},
+            {brand: "Nissan", model: "X-Trail", front: 35, rear: 33},
+            {brand: "Nissan", model: "Altima", front: 33, rear: 30},
+            {brand: "Nissan", model: "Frontier", front: 35, rear: 35},
+            {brand: "Nissan", model: "Pathfinder", front: 35, rear: 35},
+            {brand: "Nissan", model: "Murano", front: 33, rear: 33},
+            {brand: "Nissan", model: "Urvan", front: 45, rear: 50},
+            {brand: "Nissan", model: "Tiida", front: 32, rear: 30},
+            {brand: "Nissan", model: "Tsuru", front: 30, rear: 28},
+            {brand: "Nissan", model: "Rogue", front: 33, rear: 33},
+            {brand: "Nissan", model: "Maxima", front: 35, rear: 33},
+            {brand: "Nissan", model: "370Z", front: 33, rear: 33},
+            {brand: "Nissan", model: "GT-R", front: 30, rear: 30},
+            {brand: "Nissan", model: "Armada", front: 35, rear: 35},
+            {brand: "Nissan", model: "NP300", front: 35, rear: 38},
+            {brand: "Nissan", model: "Leaf", front: 36, rear: 36},
+            {brand: "Nissan", model: "Note", front: 32, rear: 30},
+            {brand: "Nissan", model: "Micra", front: 32, rear: 30},
+            {brand: "Nissan", model: "Juke", front: 33, rear: 30},
+            {brand: "Nissan", model: "X-Terra", front: 35, rear: 35},
+            {brand: "Nissan", model: "Aprio", front: 30, rear: 28},
+            {brand: "Nissan", model: "Platina", front: 30, rear: 28},
+            {brand: "Nissan", model: "D21", front: 32, rear: 35},
+            {brand: "Nissan", model: "Z", front: 33, rear: 33},
+            {brand: "Nissan", model: "Kicks e-POWER", front: 33, rear: 30},
+            {brand: "Nissan", model: "X-Trail e-POWER", front: 35, rear: 33},
+            {brand: "Nissan", model: "Magnite", front: 32, rear: 30},
+            {brand: "Nissan", model: "Ariya", front: 36, rear: 36},
+            {brand: "Nissan", model: "Silvia", front: 32, rear: 30},
+            {brand: "Nissan", model: "Skyline", front: 33, rear: 33},
+            {brand: "Nissan", model: "Terrano", front: 35, rear: 35},
+            {brand: "Nissan", model: "Patrol", front: 35, rear: 35},
+            {brand: "Nissan", model: "Pulsar", front: 32, rear: 30},
+            {brand: "Nissan", model: "Primastar", front: 38, rear: 42},
+            {brand: "Nissan", model: "NV200", front: 36, rear: 38},
+            {brand: "Nissan", model: "Qashqai", front: 33, rear: 30},
+            {brand: "Nissan", model: "Almera", front: 32, rear: 30},
+            {brand: "Chevrolet", model: "Aveo", front: 32, rear: 30},
+            {brand: "Chevrolet", model: "Onix", front: 33, rear: 30},
+            {brand: "Chevrolet", model: "Tracker", front: 33, rear: 30},
+            {brand: "Chevrolet", model: "Groove", front: 32, rear: 30},
+            {brand: "Chevrolet", model: "Captiva", front: 35, rear: 33},
+            {brand: "Chevrolet", model: "Suburban", front: 35, rear: 35},
+            {brand: "Chevrolet", model: "Tahoe", front: 35, rear: 35},
+            {brand: "Chevrolet", model: "Trax", front: 33, rear: 30},
+            {brand: "Chevrolet", model: "Equinox", front: 35, rear: 33},
+            {brand: "Chevrolet", model: "Spark", front: 32, rear: 30},
+            {brand: "Chevrolet", model: "Cruze", front: 33, rear: 30},
+            {brand: "Chevrolet", model: "S10 Max", front: 35, rear: 38},
+            {brand: "Chevrolet", model: "Camaro", front: 35, rear: 35},
+            {brand: "Chevrolet", model: "Corvette", front: 30, rear: 30},
+            {brand: "Chevrolet", model: "Cavalier", front: 32, rear: 30},
+            {brand: "Chevrolet", model: "Malibu", front: 33, rear: 30},
+            {brand: "Chevrolet", model: "Blazer", front: 35, rear: 33},
+            {brand: "Chevrolet", model: "Traverse", front: 35, rear: 35},
+            {brand: "Chevrolet", model: "Colorado", front: 35, rear: 35},
+            {brand: "Chevrolet", model: "Silverado", front: 35, rear: 38},
+            {brand: "Chevrolet", model: "Tornado", front: 32, rear: 35},
+            {brand: "Chevrolet", model: "Matiz", front: 30, rear: 28},
+            {brand: "Chevrolet", model: "Optra", front: 32, rear: 30},
+            {brand: "Chevrolet", model: "Corsa", front: 30, rear: 28},
+            {brand: "Chevrolet", model: "Monza", front: 30, rear: 28},
+            {brand: "Chevrolet", model: "Astra", front: 32, rear: 30},
+            {brand: "Chevrolet", model: "Beat", front: 32, rear: 30},
+            {brand: "Chevrolet", model: "Sonic", front: 32, rear: 30},
+            {brand: "Chevrolet", model: "Blazer EV", front: 36, rear: 36},
+            {brand: "Chevrolet", model: "Cheyenne", front: 35, rear: 38},
+            {brand: "Chevrolet", model: "S10", front: 35, rear: 38},
+            {brand: "Chevrolet", model: "Trailblazer", front: 35, rear: 35},
+            {brand: "Chevrolet", model: "Chevy", front: 30, rear: 28},
+            {brand: "Chevrolet", model: "Impala", front: 33, rear: 30},
+            {brand: "Chevrolet", model: "SSR", front: 32, rear: 32},
+            {brand: "Chevrolet", model: "Avalanche", front: 35, rear: 35},
+            {brand: "Chevrolet", model: "Uplander", front: 35, rear: 35},
+            {brand: "Chevrolet", model: "Express", front: 50, rear: 80},
+            {brand: "Chevrolet", model: "Montana", front: 33, rear: 35},
+            {brand: "Volkswagen", model: "Jetta", front: 33, rear: 30},
+            {brand: "Volkswagen", model: "Virtus", front: 33, rear: 30},
+            {brand: "Volkswagen", model: "Polo", front: 32, rear: 30},
+            {brand: "Volkswagen", model: "Taos", front: 33, rear: 30},
+            {brand: "Volkswagen", model: "Tiguan", front: 35, rear: 33},
+            {brand: "Volkswagen", model: "Nivus", front: 33, rear: 30},
+            {brand: "Volkswagen", model: "Gol", front: 30, rear: 28},
+            {brand: "Volkswagen", model: "Clasico", front: 32, rear: 30},
+            {brand: "Volkswagen", model: "Vento", front: 32, rear: 30},
+            {brand: "Volkswagen", model: "T-Cross", front: 33, rear: 30},
+            {brand: "Volkswagen", model: "Teramont", front: 36, rear: 36},
+            {brand: "Volkswagen", model: "CrossFox", front: 32, rear: 30},
+            {brand: "Volkswagen", model: "Saveiro", front: 32, rear: 35},
+            {brand: "Volkswagen", model: "Passat", front: 33, rear: 30},
+            {brand: "Volkswagen", model: "Amarok", front: 35, rear: 38},
+            {brand: "Volkswagen", model: "Golf", front: 32, rear: 30},
+            {brand: "Volkswagen", model: "Beetle", front: 32, rear: 30},
+            {brand: "Volkswagen", model: "Bora", front: 32, rear: 30},
+            {brand: "Volkswagen", model: "Lupo", front: 30, rear: 28},
+            {brand: "Volkswagen", model: "Pointer", front: 30, rear: 28},
+            {brand: "Volkswagen", model: "Sedan (Vocho)", front: 24, rear: 28},
+            {brand: "Volkswagen", model: "Combi", front: 28, rear: 36},
+            {brand: "Volkswagen", model: "Touareg", front: 35, rear: 35},
+            {brand: "Volkswagen", model: "ID.4", front: 36, rear: 36},
+            {brand: "Volkswagen", model: "Golf GTI", front: 35, rear: 33},
+            {brand: "Volkswagen", model: "Golf R", front: 35, rear: 33},
+            {brand: "Volkswagen", model: "Eurovan", front: 38, rear: 42},
+            {brand: "Volkswagen", model: "Derby", front: 30, rear: 28},
+            {brand: "Volkswagen", model: "Transporter", front: 38, rear: 42},
+            {brand: "Volkswagen", model: "Atlas", front: 36, rear: 36},
+            {brand: "Volkswagen", model: "Arteon", front: 35, rear: 33},
+            {brand: "Volkswagen", model: "Scirocco", front: 33, rear: 30},
+            {brand: "Volkswagen", model: "Corrado", front: 32, rear: 30},
+            {brand: "Volkswagen", model: "Up!", front: 30, rear: 28},
+            {brand: "Volkswagen", model: "Eos", front: 32, rear: 30},
+            {brand: "Volkswagen", model: "T-Roc", front: 33, rear: 30},
+            {brand: "Kia", model: "K3", front: 33, rear: 30},
+            {brand: "Kia", model: "Rio", front: 32, rear: 30},
+            {brand: "Kia", model: "Seltos", front: 33, rear: 30},
+            {brand: "Kia", model: "Sportage", front: 35, rear: 33},
+            {brand: "Kia", model: "Forte", front: 33, rear: 30},
+            {brand: "Kia", model: "Soul", front: 33, rear: 30},
+            {brand: "Kia", model: "Sorento", front: 35, rear: 35},
+            {brand: "Kia", model: "Optima", front: 33, rear: 30},
+            {brand: "Kia", model: "Stinger", front: 35, rear: 35},
+            {brand: "Kia", model: "Telluride", front: 36, rear: 36},
+            {brand: "Kia", model: "Niro", front: 36, rear: 36},
+            {brand: "Kia", model: "Carnival", front: 35, rear: 35},
+            {brand: "Kia", model: "Pegas", front: 32, rear: 30},
+            {brand: "Kia", model: "Sonet", front: 33, rear: 30},
+            {brand: "Kia", model: "EV6", front: 36, rear: 36},
+            {brand: "Kia", model: "EV9", front: 38, rear: 38},
+            {brand: "Kia", model: "K5", front: 33, rear: 30},
+            {brand: "Kia", model: "Sedona", front: 35, rear: 35},
+            {brand: "Kia", model: "Cadenza", front: 33, rear: 30},
+            {brand: "Kia", model: "Mohave", front: 35, rear: 35},
+            {brand: "Kia", model: "Picanto", front: 30, rear: 28},
+            {brand: "Kia", model: "Stonic", front: 33, rear: 30},
+            {brand: "Kia", model: "K4", front: 33, rear: 30},
+            {brand: "Toyota", model: "Prius", front: 36, rear: 36},
+            {brand: "Toyota", model: "Hilux", front: 35, rear: 38},
+            {brand: "Toyota", model: "RAV4", front: 35, rear: 33},
+            {brand: "Toyota", model: "Corolla", front: 33, rear: 30},
+            {brand: "Toyota", model: "Yaris", front: 32, rear: 30},
+            {brand: "Toyota", model: "Camry", front: 33, rear: 30},
+            {brand: "Toyota", model: "Tacoma", front: 32, rear: 32},
+            {brand: "Toyota", model: "Highlander", front: 35, rear: 35},
+            {brand: "Toyota", model: "Sienna", front: 35, rear: 35},
+            {brand: "Toyota", model: "Avanza", front: 33, rear: 35},
+            {brand: "Toyota", model: "Raize", front: 32, rear: 30},
+            {brand: "Toyota", model: "Corolla Cross", front: 33, rear: 30},
+            {brand: "Toyota", model: "Land Cruiser", front: 35, rear: 35},
+            {brand: "Toyota", model: "Supra", front: 32, rear: 32},
+            {brand: "Toyota", model: "C-HR", front: 33, rear: 30},
+            {brand: "Toyota", model: "Tundra", front: 35, rear: 38},
+            {brand: "Toyota", model: "Sequoia", front: 35, rear: 35},
+            {brand: "Toyota", model: "4Runner", front: 32, rear: 32},
+            {brand: "Toyota", model: "FJ Cruiser", front: 32, rear: 32},
+            {brand: "Toyota", model: "Yaris Cross", front: 33, rear: 30},
+            {brand: "Toyota", model: "GR86", front: 32, rear: 32},
+            {brand: "Toyota", model: "Crown", front: 33, rear: 33},
+            {brand: "Toyota", model: "Grand Highlander", front: 35, rear: 35},
+            {brand: "Toyota", model: "Hiace", front: 40, rear: 45},
+            {brand: "Toyota", model: "bZ4X", front: 36, rear: 36},
+            {brand: "Toyota", model: "Land Cruiser Prado", front: 35, rear: 35},
+            {brand: "Toyota", model: "Fortuner", front: 30, rear: 33},
+            {brand: "Toyota", model: "Rush", front: 33, rear: 35},
+            {brand: "Mazda", model: "Mazda 3", front: 33, rear: 30},
+            {brand: "Mazda", model: "Mazda 2", front: 32, rear: 30},
+            {brand: "Mazda", model: "CX-3", front: 33, rear: 30},
+            {brand: "Mazda", model: "CX-30", front: 33, rear: 30},
+            {brand: "Mazda", model: "CX-5", front: 35, rear: 33},
+            {brand: "Mazda", model: "CX-50", front: 35, rear: 33},
+            {brand: "Mazda", model: "CX-9", front: 35, rear: 35},
+            {brand: "Mazda", model: "CX-70", front: 36, rear: 36},
+            {brand: "Mazda", model: "CX-90", front: 36, rear: 36},
+            {brand: "Mazda", model: "Mazda 6", front: 33, rear: 30},
+            {brand: "Mazda", model: "MX-5 Miata", front: 29, rear: 29},
+            {brand: "Mazda", model: "CX-7", front: 33, rear: 33},
+            {brand: "Mazda", model: "Protege", front: 30, rear: 28},
+            {brand: "Mazda", model: "Tribute", front: 32, rear: 32},
+            {brand: "Mazda", model: "RX-8", front: 32, rear: 32},
+            {brand: "Mazda", model: "BT-50", front: 35, rear: 38},
+            {brand: "Mazda", model: "CX-60", front: 35, rear: 35},
+            {brand: "Mazda", model: "MX-30", front: 36, rear: 36},
+            {brand: "Hyundai", model: "Grand i10", front: 32, rear: 30},
+            {brand: "Hyundai", model: "Creta", front: 33, rear: 30},
+            {brand: "Hyundai", model: "Elantra", front: 33, rear: 30},
+            {brand: "Hyundai", model: "Tucson", front: 35, rear: 33},
+            {brand: "Hyundai", model: "Accent", front: 32, rear: 30},
+            {brand: "Hyundai", model: "Santa Fe", front: 35, rear: 35},
+            {brand: "Hyundai", model: "Palisade", front: 35, rear: 35},
+            {brand: "Hyundai", model: "Sonata", front: 33, rear: 30},
+            {brand: "Hyundai", model: "Ioniq 5", front: 36, rear: 36},
+            {brand: "Hyundai", model: "Ioniq 6", front: 36, rear: 36},
+            {brand: "Hyundai", model: "HB20", front: 32, rear: 30},
+            {brand: "Hyundai", model: "Kona", front: 33, rear: 30},
+            {brand: "Hyundai", model: "Atos", front: 30, rear: 28},
+            {brand: "Hyundai", model: "ix35", front: 33, rear: 33},
+            {brand: "Hyundai", model: "Veloster", front: 32, rear: 30},
+            {brand: "Hyundai", model: "Staria", front: 38, rear: 42},
+            {brand: "Hyundai", model: "Venue", front: 33, rear: 30},
+            {brand: "Hyundai", model: "Santa Cruz", front: 33, rear: 35},
+            {brand: "Ford", model: "Lobo", front: 35, rear: 38},
+            {brand: "Ford", model: "Escape", front: 35, rear: 33},
+            {brand: "Ford", model: "Territory", front: 33, rear: 33},
+            {brand: "Ford", model: "Explorer", front: 35, rear: 35},
+            {brand: "Ford", model: "Bronco Sport", front: 33, rear: 33},
+            {brand: "Ford", model: "Bronco", front: 35, rear: 35},
+            {brand: "Ford", model: "Mustang", front: 35, rear: 35},
+            {brand: "Ford", model: "Ranger", front: 35, rear: 38},
+            {brand: "Ford", model: "Edge", front: 35, rear: 33},
+            {brand: "Ford", model: "Expedition", front: 35, rear: 35},
+            {brand: "Ford", model: "Focus", front: 32, rear: 30},
+            {brand: "Ford", model: "Fiesta", front: 32, rear: 30},
+            {brand: "Ford", model: "EcoSport", front: 33, rear: 30},
+            {brand: "Ford", model: "Figo", front: 32, rear: 30},
+            {brand: "Ford", model: "F-150", front: 35, rear: 38},
+            {brand: "Ford", model: "Maverick", front: 33, rear: 35},
+            {brand: "Ford", model: "Fusion", front: 33, rear: 30},
+            {brand: "Ford", model: "Mustang Mach-E", front: 36, rear: 36},
+            {brand: "Ford", model: "Transit", front: 45, rear: 55},
+            {brand: "Ford", model: "Grand Marquis", front: 32, rear: 30},
+            {brand: "Ford", model: "Crown Victoria", front: 32, rear: 30},
+            {brand: "Ford", model: "Ka", front: 30, rear: 28},
+            {brand: "Honda", model: "CR-V", front: 35, rear: 33},
+            {brand: "Honda", model: "Civic", front: 33, rear: 30},
+            {brand: "Honda", model: "HR-V", front: 33, rear: 30},
+            {brand: "Honda", model: "City", front: 32, rear: 30},
+            {brand: "Honda", model: "BR-V", front: 33, rear: 35},
+            {brand: "Honda", model: "Fit", front: 32, rear: 30},
+            {brand: "Honda", model: "Accord", front: 33, rear: 30},
+            {brand: "Honda", model: "Pilot", front: 35, rear: 35},
+            {brand: "Honda", model: "Odyssey", front: 36, rear: 36},
+            {brand: "Honda", model: "WR-V", front: 33, rear: 30},
+            {brand: "Honda", model: "Ridgeline", front: 33, rear: 33},
+            {brand: "Honda", model: "Passport", front: 35, rear: 35},
+            {brand: "Honda", model: "Element", front: 32, rear: 32},
+            {brand: "Honda", model: "Insight", front: 35, rear: 35},
+            {brand: "Honda", model: "S2000", front: 32, rear: 32},
+            {brand: "Honda", model: "Civic Type R", front: 35, rear: 33},
+            {brand: "Honda", model: "ZR-V", front: 33, rear: 30},
+            {brand: "SEAT", model: "Ibiza", front: 32, rear: 30},
+            {brand: "SEAT", model: "Leon", front: 33, rear: 30},
+            {brand: "SEAT", model: "Ateca", front: 35, rear: 33},
+            {brand: "SEAT", model: "Arona", front: 33, rear: 30},
+            {brand: "SEAT", model: "Tarraco", front: 36, rear: 36},
+            {brand: "SEAT", model: "Toledo", front: 32, rear: 30},
+            {brand: "SEAT", model: "Altea", front: 32, rear: 30},
+            {brand: "SEAT", model: "Cordoba", front: 30, rear: 28},
+            {brand: "SEAT", model: "Mii", front: 30, rear: 28},
+            {brand: "SEAT", model: "Alhambra", front: 35, rear: 35},
+            {brand: "SEAT", model: "Exeo", front: 33, rear: 30},
+            {brand: "SEAT", model: "Arosa", front: 30, rear: 28},
+            {brand: "Renault", model: "Kwid", front: 29, rear: 29},
+            {brand: "Renault", model: "Duster", front: 33, rear: 35},
+            {brand: "Renault", model: "Captur", front: 33, rear: 30},
+            {brand: "Renault", model: "Stepway", front: 32, rear: 30},
+            {brand: "Renault", model: "Oroch", front: 33, rear: 36},
+            {brand: "Renault", model: "Koleos", front: 35, rear: 33},
+            {brand: "Renault", model: "Logan", front: 32, rear: 30},
+            {brand: "Renault", model: "Sandero", front: 32, rear: 30},
+            {brand: "Renault", model: "Kangoo", front: 35, rear: 38},
+            {brand: "Renault", model: "Master", front: 50, rear: 60},
+            {brand: "Renault", model: "Clio", front: 32, rear: 30},
+            {brand: "Renault", model: "Megane", front: 33, rear: 30},
+            {brand: "Renault", model: "Fluence", front: 32, rear: 30},
+            {brand: "Renault", model: "Twizy", front: 22, rear: 25},
+            {brand: "Renault", model: "Arkana", front: 33, rear: 30},
+            {brand: "Renault", model: "Zoe", front: 35, rear: 35},
+            {brand: "Suzuki", model: "Swift", front: 32, rear: 30},
+            {brand: "Suzuki", model: "Vitara", front: 33, rear: 30},
+            {brand: "Suzuki", model: "Ertiga", front: 33, rear: 36},
+            {brand: "Suzuki", model: "Jimny", front: 26, rear: 26},
+            {brand: "Suzuki", model: "S-Cross", front: 33, rear: 30},
+            {brand: "Suzuki", model: "Ignis", front: 32, rear: 30},
+            {brand: "Suzuki", model: "Ciaz", front: 32, rear: 30},
+            {brand: "Suzuki", model: "Grand Vitara", front: 33, rear: 33},
+            {brand: "Suzuki", model: "Forenza", front: 32, rear: 30},
+            {brand: "Suzuki", model: "Kizashi", front: 33, rear: 30},
+            {brand: "Suzuki", model: "SX4", front: 32, rear: 30},
+            {brand: "Suzuki", model: "XL7", front: 35, rear: 35},
+            {brand: "Suzuki", model: "Aerio", front: 32, rear: 30},
+            {brand: "Suzuki", model: "Reno", front: 32, rear: 30},
+            {brand: "Suzuki", model: "Fronx", front: 32, rear: 30},
+            {brand: "Suzuki", model: "Baleno", front: 32, rear: 30},
+            {brand: "Suzuki", model: "Alto", front: 30, rear: 28},
+            {brand: "Suzuki", model: "S-Presso", front: 32, rear: 30},
+            {brand: "MG", model: "MG5", front: 33, rear: 30},
+            {brand: "MG", model: "MG ZS", front: 33, rear: 30},
+            {brand: "MG", model: "MG GT", front: 33, rear: 30},
+            {brand: "MG", model: "RX5", front: 35, rear: 33},
+            {brand: "MG", model: "One", front: 33, rear: 30},
+            {brand: "MG", model: "HS", front: 35, rear: 33},
+            {brand: "MG", model: "Marvel R", front: 36, rear: 36},
+            {brand: "MG", model: "Cyberster", front: 33, rear: 33},
+            {brand: "MG", model: "MG3", front: 32, rear: 30},
+            {brand: "MG", model: "ZS EV", front: 36, rear: 36},
+            {brand: "MG", model: "MG4", front: 36, rear: 36},
+            {brand: "MG", model: "RX8", front: 35, rear: 35},
+            {brand: "MG", model: "MG6", front: 33, rear: 30},
+            {brand: "MG", model: "Extender", front: 35, rear: 38},
+            {brand: "MG", model: "MG7", front: 33, rear: 30},
+            {brand: "Chirey", model: "Tiggo 2 Pro", front: 33, rear: 30},
+            {brand: "Chirey", model: "Tiggo 4 Pro", front: 33, rear: 30},
+            {brand: "Chirey", model: "Tiggo 7 Pro", front: 35, rear: 33},
+            {brand: "Chirey", model: "Tiggo 8 Pro", front: 35, rear: 35},
+            {brand: "Chirey", model: "Tiggo 8 Pro Max", front: 35, rear: 35},
+            {brand: "Chirey", model: "Tiggo 9 Pro", front: 36, rear: 36},
+            {brand: "Chirey", model: "Arrizo 8", front: 33, rear: 30},
+            {brand: "Chirey", model: "Omoda 5", front: 33, rear: 30},
+            {brand: "Chirey", model: "Tiggo 3x", front: 32, rear: 30},
+            {brand: "Chirey", model: "Tiggo 5x", front: 33, rear: 30},
+            {brand: "Chirey", model: "Arrizo 5", front: 32, rear: 30},
+            {brand: "Chirey", model: "Arrizo 6 Pro", front: 33, rear: 30},
+            {brand: "Omoda", model: "C5", front: 33, rear: 30},
+            {brand: "Omoda", model: "O5", front: 33, rear: 30},
+            {brand: "Omoda", model: "O5 GT", front: 33, rear: 30},
+            {brand: "Omoda", model: "E5", front: 36, rear: 36},
+            {brand: "Omoda", model: "C7", front: 35, rear: 33},
+            {brand: "Omoda", model: "C9", front: 36, rear: 36},
+            {brand: "Jaecoo", model: "Jaecoo 7", front: 35, rear: 33},
+            {brand: "Jaecoo", model: "Jaecoo 8", front: 36, rear: 36},
+            {brand: "Jaecoo", model: "Jaecoo 6", front: 35, rear: 35},
+            {brand: "Jaecoo", model: "Jaecoo 5", front: 33, rear: 30},
+            {brand: "BYD", model: "Dolphin", front: 35, rear: 35},
+            {brand: "BYD", model: "King", front: 33, rear: 30},
+            {brand: "BYD", model: "Song Plus", front: 35, rear: 33},
+            {brand: "BYD", model: "Yuan Plus", front: 35, rear: 35},
+            {brand: "BYD", model: "Han", front: 36, rear: 36},
+            {brand: "BYD", model: "Tang", front: 36, rear: 36},
+            {brand: "BYD", model: "Seal", front: 36, rear: 36},
+            {brand: "BYD", model: "Dolphin Mini", front: 35, rear: 35},
+            {brand: "BYD", model: "Shark", front: 35, rear: 38},
+            {brand: "BYD", model: "Qin Plus", front: 33, rear: 30},
+            {brand: "Mercedes-Benz", model: "Clase C", front: 33, rear: 33},
+            {brand: "Mercedes-Benz", model: "Clase A", front: 32, rear: 30},
+            {brand: "Mercedes-Benz", model: "GLA", front: 33, rear: 33},
+            {brand: "Mercedes-Benz", model: "GLC", front: 35, rear: 35},
+            {brand: "Mercedes-Benz", model: "GLE", front: 36, rear: 36},
+            {brand: "Mercedes-Benz", model: "Clase E", front: 33, rear: 35},
+            {brand: "Mercedes-Benz", model: "Clase S", front: 35, rear: 38},
+            {brand: "Mercedes-Benz", model: "GLB", front: 35, rear: 35},
+            {brand: "Mercedes-Benz", model: "GLS", front: 38, rear: 40},
+            {brand: "Mercedes-Benz", model: "CLA", front: 33, rear: 30},
+            {brand: "Mercedes-Benz", model: "CLS", front: 33, rear: 35},
+            {brand: "Mercedes-Benz", model: "Clase G", front: 36, rear: 36},
+            {brand: "Mercedes-Benz", model: "Sprinter", front: 50, rear: 65},
+            {brand: "Cadillac", model: "Escalade", front: 35, rear: 38},
+            {brand: "Cadillac", model: "XT5", front: 35, rear: 35},
+            {brand: "Cadillac", model: "XT4", front: 33, rear: 33},
+            {brand: "Cadillac", model: "Lyriq", front: 36, rear: 36},
+            {brand: "Cadillac", model: "XT6", front: 35, rear: 35},
+            {brand: "Cadillac", model: "CTS", front: 33, rear: 33},
+            {brand: "Cadillac", model: "ATS", front: 33, rear: 33},
+            {brand: "BMW", model: "Serie 3", front: 33, rear: 33},
+            {brand: "BMW", model: "X1", front: 33, rear: 33},
+            {brand: "BMW", model: "X3", front: 35, rear: 35},
+            {brand: "BMW", model: "Serie 1", front: 32, rear: 30},
+            {brand: "BMW", model: "X5", front: 36, rear: 38},
+            {brand: "BMW", model: "Serie 4", front: 33, rear: 33},
+            {brand: "BMW", model: "Serie 5", front: 35, rear: 35},
+            {brand: "BMW", model: "X4", front: 35, rear: 35},
+            {brand: "BMW", model: "X6", front: 36, rear: 38},
+            {brand: "BMW", model: "Serie 2", front: 33, rear: 30},
+            {brand: "BMW", model: "X7", front: 38, rear: 40},
+            {brand: "BMW", model: "i4", front: 36, rear: 36},
+            {brand: "BMW", model: "M3", front: 32, rear: 32},
+            {brand: "Audi", model: "A3", front: 32, rear: 30},
+            {brand: "Audi", model: "Q3", front: 33, rear: 33},
+            {brand: "Audi", model: "A4", front: 33, rear: 33},
+            {brand: "Audi", model: "Q5", front: 35, rear: 35},
+            {brand: "Audi", model: "A1", front: 32, rear: 30},
+            {brand: "Audi", model: "A6", front: 35, rear: 35},
+            {brand: "Audi", model: "Q7", front: 38, rear: 38},
+            {brand: "Audi", model: "Q8", front: 38, rear: 38},
+            {brand: "Audi", model: "TT", front: 32, rear: 32},
+            {brand: "Audi", model: "R8", front: 30, rear: 33},
+            {brand: "Volvo", model: "XC40", front: 35, rear: 35},
+            {brand: "Volvo", model: "XC60", front: 35, rear: 35},
+            {brand: "Volvo", model: "XC90", front: 38, rear: 38},
+            {brand: "Volvo", model: "C40", front: 35, rear: 35},
+            {brand: "Volvo", model: "EX30", front: 36, rear: 36},
+            {brand: "Volvo", model: "S60", front: 33, rear: 33},
+            {brand: "Volvo", model: "S90", front: 35, rear: 35},
+            {brand: "Porsche", model: "Macan", front: 35, rear: 35},
+            {brand: "Porsche", model: "Cayenne", front: 36, rear: 38},
+            {brand: "Porsche", model: "911", front: 30, rear: 34},
+            {brand: "Porsche", model: "Panamera", front: 35, rear: 38},
+            {brand: "Porsche", model: "Taycan", front: 36, rear: 38},
+            {brand: "Mini", model: "Cooper", front: 32, rear: 30},
+            {brand: "Mini", model: "Countryman", front: 35, rear: 33},
+            {brand: "Mini", model: "Clubman", front: 33, rear: 30},
+            {brand: "Lexus", model: "NX", front: 35, rear: 33},
+            {brand: "Lexus", model: "RX", front: 35, rear: 35},
+            {brand: "Lexus", model: "ES", front: 33, rear: 30},
+            {brand: "Lexus", model: "UX", front: 33, rear: 30},
+            {brand: "Lexus", model: "LX", front: 35, rear: 35},
+            {brand: "Lincoln", model: "Navigator", front: 35, rear: 38},
+            {brand: "Lincoln", model: "Corsair", front: 35, rear: 33},
+            {brand: "Lincoln", model: "Nautilus", front: 35, rear: 35},
+            {brand: "Lincoln", model: "Aviator", front: 36, rear: 36},
+            {brand: "Acura", model: "RDX", front: 35, rear: 33},
+            {brand: "Acura", model: "MDX", front: 35, rear: 35},
+            {brand: "Acura", model: "Integra", front: 33, rear: 30},
+            {brand: "Acura", model: "TLX", front: 33, rear: 33},
+            {brand: "Infiniti", model: "QX50", front: 35, rear: 33},
+            {brand: "Infiniti", model: "QX60", front: 35, rear: 35},
+            {brand: "Infiniti", model: "Q50", front: 33, rear: 33},
+            {brand: "Infiniti", model: "QX80", front: 35, rear: 38},
+            {brand: "Jeep", model: "Wrangler", front: 35, rear: 35},
+            {brand: "Jeep", model: "Renegade", front: 33, rear: 30},
+            {brand: "Jeep", model: "Grand Cherokee", front: 35, rear: 35},
+            {brand: "Jeep", model: "Compass", front: 33, rear: 30},
+            {brand: "Jeep", model: "Gladiator", front: 37, rear: 37},
+            {brand: "Jeep", model: "Cherokee", front: 33, rear: 33},
+            {brand: "RAM", model: "700", front: 32, rear: 35},
+            {brand: "RAM", model: "1500", front: 35, rear: 38},
+            {brand: "RAM", model: "2500", front: 55, rear: 65},
+            {brand: "RAM", model: "3500", front: 60, rear: 75},
+            {brand: "RAM", model: "ProMaster", front: 49, rear: 55},
+            {brand: "RAM", model: "Rampage", front: 35, rear: 38},
+            {brand: "Dodge", model: "Attitude", front: 32, rear: 30},
+            {brand: "Dodge", model: "Charger", front: 33, rear: 33},
+            {brand: "Dodge", model: "Durango", front: 36, rear: 36},
+            {brand: "Dodge", model: "Journey", front: 35, rear: 35},
+            {brand: "Dodge", model: "Challenger", front: 33, rear: 33},
+            {brand: "Dodge", model: "Hornet", front: 33, rear: 30},
+            {brand: "GMC", model: "Sierra", front: 35, rear: 38},
+            {brand: "GMC", model: "Terrain", front: 35, rear: 33},
+            {brand: "GMC", model: "Yukon", front: 35, rear: 35},
+            {brand: "GMC", model: "Acadia", front: 35, rear: 35},
+            {brand: "GMC", model: "Canyon", front: 35, rear: 35},
+            {brand: "GMC", model: "Hummer EV", front: 40, rear: 40},
+            {brand: "Cupra", model: "Formentor", front: 35, rear: 33},
+            {brand: "Cupra", model: "Leon", front: 35, rear: 33},
+            {brand: "Cupra", model: "Ateca", front: 36, rear: 35},
+            {brand: "Cupra", model: "Born", front: 36, rear: 36},
+            {brand: "Cupra", model: "Terramar", front: 35, rear: 35},
+            {brand: "Cupra", model: "Tavascan", front: 36, rear: 36},
+            {brand: "Geely", model: "Coolray", front: 33, rear: 30},
+            {brand: "Geely", model: "Monjaro", front: 35, rear: 35},
+            {brand: "Geely", model: "GX3 Pro", front: 32, rear: 30},
+            {brand: "Geely", model: "Emgrand", front: 32, rear: 30},
+            {brand: "Geely", model: "Azkarra", front: 33, rear: 33},
+            {brand: "JAC", model: "SEI 2", front: 32, rear: 30},
+            {brand: "JAC", model: "SEI 4 Pro", front: 33, rear: 30},
+            {brand: "JAC", model: "Frison T6", front: 35, rear: 38},
+            {brand: "JAC", model: "JAC E10X", front: 35, rear: 35},
+            {brand: "JAC", model: "J7", front: 33, rear: 30},
+            {brand: "JAC", model: "T9", front: 35, rear: 38},
+            {brand: "Peugeot", model: "208", front: 32, rear: 30},
+            {brand: "Peugeot", model: "2008", front: 33, rear: 30},
+            {brand: "Peugeot", model: "3008", front: 35, rear: 33},
+            {brand: "Peugeot", model: "5008", front: 36, rear: 36},
+            {brand: "Peugeot", model: "Partner", front: 38, rear: 42},
+            {brand: "Peugeot", model: "Landtrek", front: 35, rear: 38},
+            {brand: "Subaru", model: "Crosstrek", front: 33, rear: 32},
+            {brand: "Subaru", model: "Forester", front: 33, rear: 32},
+            {brand: "Subaru", model: "Outback", front: 33, rear: 32},
+            {brand: "Subaru", model: "WRX", front: 33, rear: 32},
+            {brand: "Subaru", model: "Impreza", front: 33, rear: 32},
+            {brand: "Subaru", model: "BRZ", front: 32, rear: 32},
+            {brand: "Mitsubishi", model: "Mirage G4", front: 32, rear: 30},
+            {brand: "Mitsubishi", model: "L200", front: 35, rear: 38},
+            {brand: "Mitsubishi", model: "Montero Sport", front: 33, rear: 33},
+            {brand: "Mitsubishi", model: "Outlander", front: 35, rear: 33},
+            {brand: "Mitsubishi", model: "Xpander", front: 33, rear: 35},
+            {brand: "Mitsubishi", model: "Eclipse Cross", front: 33, rear: 33},
+            {brand: "Fiat", model: "Mobi", front: 30, rear: 28},
+            {brand: "Fiat", model: "Pulse", front: 32, rear: 30},
+            {brand: "Fiat", model: "Fastback", front: 33, rear: 30},
+            {brand: "Fiat", model: "Uno", front: 30, rear: 28},
+            {brand: "Fiat", model: "Ducato", front: 50, rear: 55},
+            {brand: "Fiat", model: "Argo", front: 32, rear: 30},
+            {brand: "Fiat", model: "Cronos", front: 32, rear: 30},
+            {brand: "Fiat", model: "Toro", front: 33, rear: 36},
+            {brand: "Fiat", model: "500", front: 32, rear: 30},
+            {brand: "Fiat", model: "Strada", front: 32, rear: 35}
+        ];
+
+        // CONVERSIONES BIDIRECCIONALES
+        function convertFrom(source) {
+            let psi = 0, kpa = 0, bar = 0, kgf = 0;
+
+            const valPsi = parseFloat(document.getElementById('input-psi').value);
+            const valKpa = parseFloat(document.getElementById('input-kpa').value);
+            const valBar = parseFloat(document.getElementById('input-bar').value);
+            const valKgf = parseFloat(document.getElementById('input-kgf').value);
+
+            if (source === 'psi' && !isNaN(valPsi)) {
+                psi = valPsi;
+                kpa = psi * 6.89476;
+                bar = psi * 0.0689476;
+                kgf = psi * 0.070307;
+            } else if (source === 'kpa' && !isNaN(valKpa)) {
+                kpa = valKpa;
+                psi = kpa / 6.89476;
+                bar = kpa / 100;
+                kgf = kpa / 98.0665;
+            } else if (source === 'bar' && !isNaN(valBar)) {
+                bar = valBar;
+                psi = bar * 14.5038;
+                kpa = bar * 100;
+                kgf = bar * 1.01972;
+            } else if (source === 'kgf' && !isNaN(valKgf)) {
+                kgf = valKgf;
+                psi = kgf / 0.070307;
+                kpa = kgf * 98.0665;
+                bar = kgf / 1.01972;
+            } else {
+                if(source === 'psi' && document.getElementById('input-psi').value === '') clearAll(false);
+                if(source === 'kpa' && document.getElementById('input-kpa').value === '') clearAll(false);
+                if(source === 'bar' && document.getElementById('input-bar').value === '') clearAll(false);
+                if(source === 'kgf' && document.getElementById('input-kgf').value === '') clearAll(false);
+                return;
+            }
+
+            if (source !== 'psi') document.getElementById('input-psi').value = psi ? psi.toFixed(1) : '';
+            if (source !== 'kpa') document.getElementById('input-kpa').value = kpa ? kpa.toFixed(1) : '';
+            if (source !== 'bar') document.getElementById('input-bar').value = bar ? bar.toFixed(2) : '';
+            if (source !== 'kgf') document.getElementById('input-kgf').value = kgf ? kgf.toFixed(2) : '';
+        }
+
+        function clearAll(resetInputs = true) {
+            if(resetInputs) {
+                document.getElementById('input-psi').value = '';
+                document.getElementById('input-kpa').value = '';
+                document.getElementById('input-bar').value = '';
+                document.getElementById('input-kgf').value = '';
+            }
+        }
+
+        function loadPressureToConverter(psiValue) {
+            document.getElementById('input-psi').value = psiValue;
+            convertFrom('psi');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                searchCar();
+            }
+        }
+
+        // CÁLCULO DE SIMILITUD
+        function similarityScore(s1, s2) {
+            let longer = s1.toLowerCase();
+            let shorter = s2.toLowerCase();
+            if (longer.length < shorter.length) {
+                longer = s2.toLowerCase();
+                shorter = s1.toLowerCase();
+            }
+            let longerLength = longer.length;
+            if (longerLength === 0) return 1.0;
+            return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+        }
+
+        function editDistance(s1, s2) {
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+            let costs = new Array();
+            for (let i = 0; i <= s1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i === 0) costs[j] = j;
+                    else {
+                        if (j > 0) {
+                            let newValue = costs[j - 1];
+                            if (s1.charAt(i - 1) !== s2.charAt(j - 1))
+                                newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                            costs[j - 1] = lastValue;
+                            lastValue = newValue;
+                        }
+                    }
+                }
+                if (i > 0) costs[s2.length] = lastValue;
+            }
+            return costs[s2.length];
+        }
+
+        function searchCar() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = '';
+
+            if (!query) {
+                resultsContainer.innerHTML = `<div style="text-align: center; color: #facc15; font-size: 1.2rem; padding: 16px; background-color: #0f172a; border-radius: 16px; border: 1px solid #334155;">⚠️ Por favor escribe una marca o modelo para buscar.</div>`;
+                return;
+            }
+
+            let matched = carDatabase.filter(car => 
+                car.brand.toLowerCase().includes(query) || 
+                car.model.toLowerCase().includes(query) ||
+                `${car.brand} ${car.model}`.toLowerCase().includes(query)
+            );
+
+            if (matched.length > 0) {
+                let html = `<p style="color: #4ade80; font-weight: bold; font-size: 1.2rem; margin-bottom: 12px;">Se encontraron ${matched.length} resultado(s):</p>`;
+                html += `<div class="results-grid">`;
+                
+                matched.forEach(car => {
+                    html += `
+                        <div class="car-card">
+                            <div>
+                                <span class="car-brand">${car.brand}</span>
+                                <h3 class="car-model">${car.model}</h3>
+                            </div>
+                            <div class="pressure-box">
+                                <div class="pressure-row">
+                                    <span>🛞 Delanteras:</span>
+                                    <strong>${car.front} PSI</strong>
+                                </div>
+                                <div class="pressure-row">
+                                    <span>🛞 Traseras:</span>
+                                    <strong>${car.rear} PSI</strong>
+                                </div>
+                            </div>
+                            <div class="car-buttons">
+                                <button onclick="loadPressureToConverter(${car.front})" class="btn-cyan">
+                                    Delanteras (${car.front})
+                                </button>
+                                <button onclick="loadPressureToConverter(${car.rear})" class="btn-emerald">
+                                    Traseras (${car.rear})
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                resultsContainer.innerHTML = html;
+            } else {
+                let scored = carDatabase.map(car => {
+                    let fullName = `${car.brand} ${car.model}`;
+                    let score = Math.max(
+                        similarityScore(query, car.model),
+                        similarityScore(query, car.brand),
+                        similarityScore(query, fullName)
+                    );
+                    return { car, score };
+                });
+
+                scored.sort((a, b) => b.score - a.score);
+                let topSimilar = scored.slice(0, 4).filter(item => item.score > 0.3);
+
+                let html = `
+                    <div class="notice-box">
+                        <h3>❌ No se encontró exactamente "${query}".</h3>
+                `;
+
+                if (topSimilar.length > 0) {
+                    html += `<p style="margin-top: 8px;">¿Quizás quisiste decir alguno de estos?</p><div class="suggestions-flex">`;
+                    topSimilar.forEach(item => {
+                        html += `
+                            <button onclick="document.getElementById('search-input').value='${item.car.model}'; searchCar();">
+                                ${item.car.brand} ${item.car.model} (${item.car.front}/${item.car.rear} PSI)
+                            </button>
+                        `;
+                    });
+                    html += `</div>`;
+                } else {
+                    html += `<p style="margin-top: 8px;">Intenta buscando por marca (ej. Nissan, Toyota) o nombre del modelo.</p>`;
+                }
+
+                html += `</div>`;
+                resultsContainer.innerHTML = html;
+            }
+        }
+    </script>
+</body>
+</html>
